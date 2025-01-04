@@ -1,0 +1,341 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "AutoFleet Control",
+    "version": "1.0.0",
+    "description": "API для управління другої лабораторної работи"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Local server"
+    }
+  ],
+  "paths": {
+    "/vehicles": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Get a list of all vehicles",
+        "description": "Returns a list of all vehicles in the system.",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "List of vehicles",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Vehicle"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Admin"],
+        "summary": "Add a new vehicle",
+        "description": "Adds a new vehicle to the system.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Vehicle data",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/VehicleInput"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successfully created vehicle",
+            "schema": {
+              "$ref": "#/definitions/Vehicle"
+            }
+          }
+        }
+      }
+    },
+    "/vehicles/{id}": {
+      "put": {
+        "tags": ["Admin"],
+        "summary": "Update vehicle",
+        "description": "Updates vehicle information by ID.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Vehicle ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Vehicle update data",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/VehicleInput"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful vehicle update",
+            "schema": {
+              "$ref": "#/definitions/Vehicle"
+            }
+          },
+          "404": {
+            "description": "Vehicle not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Admin"],
+        "summary": "Delete vehicle",
+        "description": "Deletes vehicle by ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Vehicle ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful vehicle deletion"
+          },
+          "404": {
+            "description": "Vehicle not found"
+          }
+        }
+      }
+    },
+
+    "/api/admin/users/{id}": {
+      "delete": {
+        "summary": "Delete a user",
+        "tags": ["Admin"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "User ID"
+          }
+        ],
+        "responses": {
+          "200": { "description": "User deleted successfully" },
+          "500": { "description": "Error deleting user" }
+        }
+      }
+    },
+    "/api/users": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Select the list of user",
+        "description": "Opening the list of all koristuvachiv. Available only to authorized members.",
+        "responses": {
+          "200": {
+            "description": "Successfully removing the list of user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Fence Access"
+          }
+        }
+      }
+    },
+
+    "/api/registration": {
+      "post": {
+        "summary": "User registration",
+        "description": "Registration of a new customer in the system.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 32,
+                    "example": "securepassword"
+                  }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Koristuvach successfully registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    },
+                    "tokens": {
+                      "$ref": "#/components/schemas/Tokens"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Incorrect data"
+          }
+        }
+      }
+    },
+    "/api/login": {
+      "post": {
+        "summary": "User authorization",
+        "description": "Login to the system for additional email and password.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "securepassword"
+                  }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful login",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    },
+                    "tokens": {
+                      "$ref": "#/components/schemas/Tokens"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Authorization cancellation"
+          }
+        }
+      }
+    },
+
+    "/api/logout": {
+      "post": {
+        "summary": "User's exit",
+        "description": "The accountant is logged out of the system.",
+        "responses": {
+          "200": {
+            "description": "Successful exit"
+          },
+          "400": {
+            "description": "Coming out"
+          }
+        }
+      }
+    }
+  },
+
+  "VehicleInput": {
+    "type": "object",
+    "properties": {
+      "model": {
+        "type": "string"
+      },
+      "licensePlate": {
+        "type": "string"
+      },
+      "year": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "status": {
+        "type": "string",
+        "enum": ["active", "inactive"]
+      }
+    },
+    "required": ["model", "licensePlate", "year"]
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "641c9b16f1d2b1f9d4f73985"
+          },
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          },
+          "isActivated": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "Tokens": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR..."
+          },
+          "refreshToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR..."
+          }
+        }
+      }
+    }
+  }
+}
