@@ -1,0 +1,192 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "AutoFleet Control",
+    "version": "1.0.0",
+    "description": "API для управління другої лабораторної работи"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Local server"
+    }
+  ],
+  "paths": {
+    "/api/registration": {
+      "post": {
+        "summary": "Реєстрація користувача",
+        "description": "Реєстрація нового користувача в системі.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 32,
+                    "example": "securepassword"
+                  }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Користувач успішно зареєстрований",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    },
+                    "tokens": {
+                      "$ref": "#/components/schemas/Tokens"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некоректні дані"
+          }
+        }
+      }
+    },
+    "/api/login": {
+      "post": {
+        "summary": "Авторизація користувача",
+        "description": "Вхід до системи за допомогою email та пароля.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "securepassword"
+                  }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Успішний вхід",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    },
+                    "tokens": {
+                      "$ref": "#/components/schemas/Tokens"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Помилка авторизації"
+          }
+        }
+      }
+    },
+    "/api/logout": {
+      "post": {
+        "summary": "Вихід користувача",
+        "description": "Вихід користувача із системи.",
+        "responses": {
+          "200": {
+            "description": "Успішний вихід"
+          },
+          "400": {
+            "description": "Помилка виходу"
+          }
+        }
+      }
+    },
+    "/api/users": {
+      "get": {
+        "summary": "Отримати список користувачів",
+        "description": "Отримання списку всіх користувачів. Доступно лише авторизованим користувачам.",
+        "responses": {
+          "200": {
+            "description": "Успішне отримання списку користувачів",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Доступ заборонений"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "641c9b16f1d2b1f9d4f73985"
+          },
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          },
+          "isActivated": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "Tokens": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR..."
+          },
+          "refreshToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR..."
+          }
+        }
+      }
+    }
+  }
+}
